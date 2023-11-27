@@ -1,5 +1,6 @@
 /* === Imports === */
 import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
 
 /* === Firebase Setup === */
 const firebaseConfig = {
@@ -10,9 +11,10 @@ const firebaseConfig = {
     storageBucket: "moody-97b2e.appspot.com",
     messagingSenderId: "169298961223",
     appId: "1:169298961223:web:43fb3a4f67ffdaed496262"
-  }
+}
 
-  const app = initializeApp(firebaseConfig)
+const app = initializeApp(firebaseConfig)
+const auth = getAuth(app)
 
 /* === UI === */
 
