@@ -13,7 +13,8 @@ import {
 import { 
     getFirestore, 
     collection, 
-    addDoc 
+    addDoc,
+    serverTimestamp 
 } from "firebase/firestore"
 
 /* === Firebase Setup === */
@@ -166,10 +167,12 @@ function authUpdateProfile() {
 
 /* = Functions - Firebase - Cloud Firestore = */
 
-async function addPostToDB(postBody) {
+async function addPostToDB(postBody, user) {
     try {
         const docRef = await addDoc(collection(db, "posts"), {
-          body: postBody
+          body: postBody,
+          uid: user.uid,
+          createdAt: serverTimestamp()
         });
         console.log(`Document written with ID: ${docRef.id}`)
       } catch (error) {
@@ -181,9 +184,10 @@ async function addPostToDB(postBody) {
 
 function postButtonPressed() {
     const postBody = textareaEl.value
+    const user = auth.currentUser
     
     if (postBody) {
-        addPostToDB(postBody)
+        addPostToDB(postBody, user)
         clearInputField(textareaEl)
     }
 }
