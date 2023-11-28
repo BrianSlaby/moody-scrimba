@@ -5,7 +5,9 @@ import {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged 
+    onAuthStateChanged,
+    GoogleAuthProvider,
+    signInWithPopup 
 } from "firebase/auth"
 
 /* === Firebase Setup === */
@@ -21,6 +23,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
+const provider = new GoogleAuthProvider()
 
 /* === UI === */
 
@@ -41,6 +44,8 @@ const createAccountButtonEl = document.getElementById("create-account-btn")
 
 const signOutButtonEl = document.getElementById("sign-out-btn")
 
+const userProfilePictureEl = document.getElementById("user-profile-picture")
+
 /* == UI - Event Listeners == */
 
 signInWithGoogleButtonEl.addEventListener("click", authSignInWithGoogle)
@@ -55,6 +60,7 @@ signOutButtonEl.addEventListener("click", authSignOut)
 onAuthStateChanged(auth, (user) => {
     if (user) {
         showLoggedInView()
+        showProfilePicture(userProfilePictureEl, user)
     } else {
         showLoggedOutView()
     }
@@ -65,7 +71,20 @@ onAuthStateChanged(auth, (user) => {
 /* = Functions - Firebase - Authentication = */
 
 function authSignInWithGoogle() {
-    console.log("Sign in with Google")
+    
+    signInWithPopup(auth, provider)
+    .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential.accessToken;
+        // The signed-in user info.
+        // const user = result.user;
+        console.log("Signed in with Google")
+    }).catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error(`${errorCode}: ${errorMessage}`)
+    })
 }
 
 function authSignInWithEmail() {
@@ -136,4 +155,12 @@ function clearInputField(field) {
 function clearAuthFields() {
 	clearInputField(emailInputEl)
 	clearInputField(passwordInputEl)
+}
+
+function showProfilePicture(imgElement, user) {
+    if (user.photoURL) {
+        imgElement.src = user.photoURL
+    } else {
+        imgElement.src = "assets/images/default-profile-picture.jpeg"
+    }
 }
