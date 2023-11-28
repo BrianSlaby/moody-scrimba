@@ -38,8 +38,12 @@ body {
 
 /* === Typography === */
 
-h1 {
+h1, h2 {
     margin: 0;
+}
+
+h2 {
+    font-weight: 500;
 }
 
 .app-title {
@@ -74,6 +78,10 @@ section {
     height: 3.75em;
     border-radius: 100%;
     border: var(--border-width) solid var(--dark-color);
+}
+
+.user-section h2 {
+    font-size: 1.2em;
 }
 
 /* === Nav === */
