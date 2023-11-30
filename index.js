@@ -14,7 +14,8 @@ import {
     getFirestore, 
     collection, 
     addDoc,
-    serverTimestamp 
+    serverTimestamp,
+    getDocs 
 } from "firebase/firestore"
 
 /* === Firebase Setup === */
@@ -63,6 +64,10 @@ const moodEmojiEls = document.getElementsByClassName("mood-emoji-btn")
 const textareaEl = document.getElementById("post-input")
 const postButtonEl = document.getElementById("post-btn")
 
+const fetchPostsButtonEl = document.getElementById("fetch-posts-btn")
+
+const postsEl = document.getElementById("posts")
+
 /* == UI - Event Listeners == */
 
 signInWithGoogleButtonEl.addEventListener("click", authSignInWithGoogle)
@@ -79,6 +84,8 @@ for (let moodEmojiEl of moodEmojiEls) {
 updateProfileButtonEl.addEventListener("click", authUpdateProfile)
 
 postButtonEl.addEventListener("click", postButtonPressed)
+
+fetchPostsButtonEl.addEventListener("click", fetchOnceAndRenderPostsFromDB)
 
 /* === State === */
 
@@ -190,7 +197,31 @@ async function addPostToDB(postBody, user) {
       }
 }
 
+async function fetchOnceAndRenderPostsFromDB() {
+
+    const querySnapshot = await getDocs(collection(db, "posts"))
+    clearAll(postsEl)
+
+    querySnapshot.forEach((doc) => {
+        renderPost(postsEl, doc.data())
+    })
+
+}
+
 /* == Functions - UI Functions == */
+
+function renderPost(postsEl, postData) {
+    const { createdAt, mood, body } = postData
+    postsEl.innerHTML += `
+        <div class="post">
+            <div class="header">
+                <h3>${displayDate(createdAt)}</h3>
+                <img src="assets/emojis/${mood}.png">
+            </div>
+            <p>${body}</p>
+        </div>
+        `
+}
 
 function postButtonPressed() {
     const postBody = textareaEl.value
@@ -201,6 +232,10 @@ function postButtonPressed() {
         clearInputField(textareaEl)
         resetAllMoodElements(moodEmojiEls)
     }
+}
+
+function clearAll(element) {
+    element.innerHTML = ``
 }
 
 function showLoggedOutView() {
@@ -245,6 +280,23 @@ function showUserGreeting(element, user) {
     } else {
         element.textContent = "Hey friend, how are you?"
     }
+}
+
+function displayDate(firebaseDate) {
+    const date = firebaseDate.toDate()
+    
+    const day = date.getDate()
+    const year = date.getFullYear()
+    
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const month = monthNames[date.getMonth()]
+
+    let hours = date.getHours()
+    let minutes = date.getMinutes()
+    hours = hours < 10 ? "0" + hours : hours
+    minutes = minutes < 10 ? "0" + minutes : minutes
+
+    return `${day} ${month} ${year} - ${hours}:${minutes}`
 }
 
 /* = Functions - UI Functions - Mood = */
