@@ -15,7 +15,9 @@ import {
     collection, 
     addDoc,
     serverTimestamp,
-    onSnapshot 
+    onSnapshot,
+    query,
+    where 
 } from "firebase/firestore"
 
 /* === Firebase Setup === */
@@ -92,7 +94,7 @@ onAuthStateChanged(auth, (user) => {
         showLoggedInView()
         showProfilePicture(userProfilePictureEl, user)
         showUserGreeting(userGreetingEl, user)
-        fetchInRealtimeAndRenderPostsFromDB()
+        fetchInRealtimeAndRenderPostsFromDB(user)
     } else {
         showLoggedOutView()
     }
@@ -193,8 +195,11 @@ async function addPostToDB(postBody, user) {
       }
 }
 
-function fetchInRealtimeAndRenderPostsFromDB() {
-    onSnapshot(collection(db, "posts"), (querySnapshot) => {
+function fetchInRealtimeAndRenderPostsFromDB(user) {
+   const postsRef = collection(db, "posts")
+   const q = query(postsRef, where("uid", "==", user.uid))
+
+    onSnapshot(q, (querySnapshot) => {
         clearAll(postsEl)
         querySnapshot.forEach(doc => {
             renderPost(postsEl, doc.data())
@@ -219,7 +224,6 @@ function renderPost(postsEl, postData) {
 
 function replaceNewlinesWithBrTags(inputString) {
     return inputString.replaceAll("\n", "<br>")
-    // Challenge: Use the replace method on inputString to replace newlines with break tags and return the result
 }
 
 function postButtonPressed() {
