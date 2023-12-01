@@ -15,7 +15,7 @@ import {
     collection, 
     addDoc,
     serverTimestamp,
-    getDocs 
+    onSnapshot 
 } from "firebase/firestore"
 
 /* === Firebase Setup === */
@@ -35,8 +35,6 @@ const provider = new GoogleAuthProvider()
 const db = getFirestore(app)
 
 /* === UI === */
-
-
 
 /* == UI - Elements == */
 
@@ -64,8 +62,6 @@ const moodEmojiEls = document.getElementsByClassName("mood-emoji-btn")
 const textareaEl = document.getElementById("post-input")
 const postButtonEl = document.getElementById("post-btn")
 
-const fetchPostsButtonEl = document.getElementById("fetch-posts-btn")
-
 const postsEl = document.getElementById("posts")
 
 /* == UI - Event Listeners == */
@@ -85,8 +81,6 @@ updateProfileButtonEl.addEventListener("click", authUpdateProfile)
 
 postButtonEl.addEventListener("click", postButtonPressed)
 
-fetchPostsButtonEl.addEventListener("click", fetchOnceAndRenderPostsFromDB)
-
 /* === State === */
 
 let moodState = 0
@@ -98,6 +92,7 @@ onAuthStateChanged(auth, (user) => {
         showLoggedInView()
         showProfilePicture(userProfilePictureEl, user)
         showUserGreeting(userGreetingEl, user)
+        fetchInRealtimeAndRenderPostsFromDB()
     } else {
         showLoggedOutView()
     }
@@ -117,6 +112,7 @@ function authSignInWithGoogle() {
         // The signed-in user info.
         // const user = result.user;
         console.log("Signed in with Google")
+        console.log(result.user)
     }).catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -197,15 +193,13 @@ async function addPostToDB(postBody, user) {
       }
 }
 
-async function fetchOnceAndRenderPostsFromDB() {
-
-    const querySnapshot = await getDocs(collection(db, "posts"))
-    clearAll(postsEl)
-
-    querySnapshot.forEach((doc) => {
-        renderPost(postsEl, doc.data())
+function fetchInRealtimeAndRenderPostsFromDB() {
+    onSnapshot(collection(db, "posts"), (querySnapshot) => {
+        clearAll(postsEl)
+        querySnapshot.forEach(doc => {
+            renderPost(postsEl, doc.data())
+        })
     })
-
 }
 
 /* == Functions - UI Functions == */
@@ -218,9 +212,14 @@ function renderPost(postsEl, postData) {
                 <h3>${displayDate(createdAt)}</h3>
                 <img src="assets/emojis/${mood}.png">
             </div>
-            <p>${body}</p>
+            <p>${replaceNewlinesWithBrTags(body)}</p>
         </div>
         `
+}
+
+function replaceNewlinesWithBrTags(inputString) {
+    return inputString.replaceAll("\n", "<br>")
+    // Challenge: Use the replace method on inputString to replace newlines with break tags and return the result
 }
 
 function postButtonPressed() {
@@ -283,6 +282,10 @@ function showUserGreeting(element, user) {
 }
 
 function displayDate(firebaseDate) {
+    if (!firebaseDate) {
+        return "Date processing"
+    }
+
     const date = firebaseDate.toDate()
     
     const day = date.getDate()
