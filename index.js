@@ -17,7 +17,8 @@ import {
     serverTimestamp,
     onSnapshot,
     query,
-    where 
+    where,
+    orderBy 
 } from "firebase/firestore"
 
 /* === Firebase Setup === */
@@ -114,7 +115,7 @@ function authSignInWithGoogle() {
         // The signed-in user info.
         // const user = result.user;
         console.log("Signed in with Google")
-        console.log(result.user)
+        // console.log(result.user)
     }).catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -197,7 +198,7 @@ async function addPostToDB(postBody, user) {
 
 function fetchInRealtimeAndRenderPostsFromDB(user) {
    const postsRef = collection(db, "posts")
-   const q = query(postsRef, where("uid", "==", user.uid))
+   const q = query(postsRef, where("uid", "==", user.uid), orderBy("createdAt", "desc"))
 
     onSnapshot(q, (querySnapshot) => {
         clearAll(postsEl)
