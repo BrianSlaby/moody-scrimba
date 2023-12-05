@@ -200,6 +200,12 @@ section {
 
 /* = Posts Section - Posts - Footer = */
 
+.post .footer {
+    display: flex;
+    align-self: flex-start;
+    gap: 0.4em;
+}
+
 .post .footer button {
     font-size: 0.9em;
     padding: 0.2em 0.8em;
@@ -214,6 +220,10 @@ section {
 
 .post .footer .edit-color {
     background-color: var(--post-color);
+}
+
+.post .footer .delete-color {
+    background-color: var(--delete-color);
 }
 
 /* === Nav === */
