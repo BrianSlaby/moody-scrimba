@@ -426,8 +426,7 @@ function showProfilePicture(imgElement, user) {
     if (user.photoURL) {
         imgElement.src = user.photoURL
     } else {
-        // Debugging images
-        imgElement.src = "scrimba-moody.netlify.app/assets/images/default-profile-picture.jpeg"
+        imgElement.src = "/assets/images/default-profile-picture.jpeg"
     }
 }
 
