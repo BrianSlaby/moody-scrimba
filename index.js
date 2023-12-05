@@ -18,7 +18,9 @@ import {
     onSnapshot,
     query,
     where,
-    orderBy 
+    orderBy,
+    doc,
+    updateDoc 
 } from "firebase/firestore"
 
 /* === Firebase Setup === */
@@ -205,11 +207,19 @@ async function addPostToDB(postBody, user) {
       }
 }
 
+async function updatePostInDB(docId, newBody) {
+    const postRef = doc(db, "posts", docId)
+
+    await updateDoc(postRef, {
+        body: newBody
+    })
+}
+
 function fetchInRealtimeAndRenderPostsFromDB(query) {
     onSnapshot(query, (querySnapshot) => {
         clearAll(postsEl)
         querySnapshot.forEach(doc => {
-            renderPost(postsEl, doc.data())
+            renderPost(postsEl, doc)
         })
     })
 }
@@ -309,12 +319,41 @@ function createPostBody(postData) {
     return postBody
 }
 
-function renderPost(postsEl, postData) {
+function createPostUpdateButton(wholeDoc) {
+    const postId = wholeDoc.id
+    const postData = wholeDoc.data()
+
+    const button = document.createElement("button")
+    button.textContent = "Edit"
+    button.classList.add("edit-color")
+    button.addEventListener("click", function() {
+        const newBody = prompt("Edit the post", postData.body)
+
+        if (newBody) {
+            updatePostInDB(postId, newBody)
+        }
+    })
+    
+    return button
+}
+
+function createPostFooter(wholeDoc) {
+    const footerDiv = document.createElement("div")
+    footerDiv.className = "footer"
+    
+    footerDiv.appendChild(createPostUpdateButton(wholeDoc))
+    
+    return footerDiv
+}
+
+function renderPost(postsEl, wholeDoc) {
+    const postData = wholeDoc.data()
     const postDiv = document.createElement("div")
     postDiv.className = "post"
 
     postDiv.appendChild(createPostHeader(postData))  
     postDiv.appendChild(createPostBody(postData))
+    postDiv.appendChild(createPostFooter(wholeDoc))
         
     postsEl.appendChild(postDiv)
 }
