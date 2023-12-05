@@ -1,5 +1,11 @@
 # co8b74365af3e0eae1a7caf9b
 
+## Project Overview
+
+Moody is a digital mood journal, and is the project built in Scrimba's [Learn Firebase Course] (https://scrimba.com/learn/learnfirebase) to demonstrate the core concepts of Firebase.  Users can create an account or sign in using Google, and the Firebase security rules ensure that users can only view, edit, or delete their own posts.  
+
+I deployed this project using Netlify: [https://scrimba-moody.netlify.app/] (https://scrimba-moody.netlify.app/)
+
 Quick start:
 
 ```
