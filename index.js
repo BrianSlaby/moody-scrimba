@@ -283,17 +283,40 @@ function fetchAllPosts(user) {
 
 /* == Functions - UI Functions == */
 
+function createPostHeader(postData) {
+    const { createdAt, mood } = postData
+
+    const headerDiv = document.createElement("div")
+    headerDiv.className = "header"
+
+    const headerDate = document.createElement("h3")
+    headerDate.textContent = displayDate(createdAt)
+    headerDiv.appendChild(headerDate)
+
+    const moodImage = document.createElement("img")
+    moodImage.src = `assets/emojis/${mood}.png`
+    headerDiv.appendChild(moodImage)
+
+    return headerDiv
+}
+
+function createPostBody(postData) {
+    const { body } = postData
+
+    const postBody = document.createElement("p")
+    postBody.innerHTML = replaceNewlinesWithBrTags(body)
+
+    return postBody
+}
+
 function renderPost(postsEl, postData) {
-    const { createdAt, mood, body } = postData
-    postsEl.innerHTML += `
-        <div class="post">
-            <div class="header">
-                <h3>${displayDate(createdAt)}</h3>
-                <img src="assets/emojis/${mood}.png">
-            </div>
-            <p>${replaceNewlinesWithBrTags(body)}</p>
-        </div>
-        `
+    const postDiv = document.createElement("div")
+    postDiv.className = "post"
+
+    postDiv.appendChild(createPostHeader(postData))  
+    postDiv.appendChild(createPostBody(postData))
+        
+    postsEl.appendChild(postDiv)
 }
 
 function replaceNewlinesWithBrTags(inputString) {
